@@ -2,8 +2,8 @@
 // http://localhost:3000/isolated/exercise/01.js
 import React from 'react';
 
-function Greeting() {
-  const [name, setName] = React.useState('');
+function Greeting({initialName=""}) {
+  const [name, setName] = React.useState(initialName);
 
   function handleChange(event) {
     setName(event.target.value);
@@ -13,7 +13,7 @@ function Greeting() {
     <div>
       <form>
         <label htmlFor="name">Name: </label>
-        <input onChange={handleChange} id="name" />
+        <input value={name} onChange={handleChange} id="name" />
       </form>
       {name ? <strong>Hello {name}</strong> : 'Please type your name'}
     </div>
@@ -21,7 +21,7 @@ function Greeting() {
 }
 
 function App() {
-  return <Greeting />
+  return <Greeting initialName="Stranger" />
 }
 
 export default App
