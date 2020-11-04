@@ -6,16 +6,16 @@ import { useLocalStorageState } from '../utils'
 
 function Board() {
   // 🐨 squares is the state for this component. Add useState for squares
-const [squares, setSquares] = useLocalStorageState('squares', () => Array(9).fill(null))
+const [sqrHistory, setSqrHistory] = useLocalStorageState('sqrHistory', () => [Array(9).fill(null)])
 
   // 🐨 We'll need the following bits of derived state:
   // - nextValue ('X' or 'O')
-  const nextValue = calculateNextValue(squares)
+  const nextValue = calculateNextValue(sqrHistory[0])
   // - winner ('X', 'O', or null)
-  const winner = calculateWinner(squares)
+  const winner = calculateWinner(sqrHistory[0])
   // - status (`Winner: ${winner}`, `Scratch: Cat's game`, or `Next player:
   //   ${nextValue}`)
-  const status = calculateStatus(winner, squares, nextValue)
+  const status = calculateStatus(winner, sqrHistory[0], nextValue)
   // 💰 I've written the calculations for you! So you can use my utilities
   // below to create these variables
 
@@ -27,27 +27,35 @@ const [squares, setSquares] = useLocalStorageState('squares', () => Array(9).fil
     // clicked), then return early so we don't make any state changes
     if (winner) return;
 
-    const squaresCopy = [...squares]
+    const sqrCopy = [...sqrHistory[0]]
+    const sqrHistoryCopy = [sqrCopy, ...sqrHistory]
 
-    squaresCopy[square] = nextValue
+    sqrHistoryCopy[0][square] = nextValue
 
-    setSquares(squaresCopy)
+    setSqrHistory(sqrHistoryCopy)
   }
 
   function restart() {
     // 🐨 reset the squares
     // 💰 `Array(9).fill(null)` will do it!
-    setSquares(Array(9).fill(null))
+    setSqrHistory([Array(9).fill(null)])
   }
 
   function renderSquare(i) {
     return (
       <button className="square" onClick={() => selectSquare(i)}>
-        {squares[i]}
+        {sqrHistory[0][i]}
       </button>
     )
   }
 
+  function undo () {
+    if (sqrHistory.length <= 1) return;
+    // set the squares history to a copy of the history, minus
+    // the 0th index
+    const newSqrHistory = sqrHistory.slice(1);
+    setSqrHistory(newSqrHistory)
+  }
   return (
     <div>
       {/* 🐨 put the status in the div below */}
@@ -69,6 +77,9 @@ const [squares, setSquares] = useLocalStorageState('squares', () => Array(9).fil
       </div>
       <button className="restart" onClick={restart}>
         restart
+      </button>
+      <button className="undo" onClick={undo}>
+        undo
       </button>
     </div>
   )
